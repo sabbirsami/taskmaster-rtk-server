@@ -1,3 +1,4 @@
+import cors from "cors";
 import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 import QueryBuilder from "./QueryBuilder";
@@ -14,11 +15,13 @@ const taskSchema = new mongoose.Schema({
   priority: { type: String, enum: ["low", "medium", "high"], required: true },
   dueDate: { type: Date },
   isCompleted: { type: Boolean, default: false },
+  assignTo: { type: String },
 });
 
 const Task = mongoose.model("Task", taskSchema);
 
 app.use(express.json());
+app.use(cors());
 
 // Get all tasks
 app.get("/api/tasks", async (req: Request, res: Response) => {
@@ -67,6 +70,10 @@ app.patch("/api/tasks/:id", async (req: Request, res: Response) => {
 app.delete("/api/tasks/:id", async (req: Request, res: Response) => {
   await Task.findByIdAndDelete(req.params.id);
   res.json({ message: "Task deleted" });
+});
+
+app.get("/", (req, res) => {
+  res.send("Server working");
 });
 
 const PORT = process.env.PORT || 5000;
